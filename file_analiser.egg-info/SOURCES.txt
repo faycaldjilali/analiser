@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.py
+file_analiser.egg-info/PKG-INFO
+file_analiser.egg-info/SOURCES.txt
+file_analiser.egg-info/dependency_links.txt
+file_analiser.egg-info/requires.txt
+file_analiser.egg-info/top_level.txt
+src/__init__.py
+src/prompt.py
+src/rc_handler.py
+src/zip_extractor.py
