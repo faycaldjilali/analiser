@@ -3,9 +3,9 @@ import PyPDF2
 import json
 import csv
 import cohere
-from src.prompt import get_prompt_1, get_prompt_2  # Import the prompts from prompt.py
+import streamlit as st 
 # Initialize Cohere client
-cohere_client = cohere.Client('bJUG8z3vdI97BogE8QJYyeyglJ5UtzpQYnxo3qh9')
+cohere_client = cohere.Client('IdlHWXxZ6LEt90RvFKvXKv4CYzrR8BCQLq63yriI')
 
 # Extract text from PDF
 def extract_text_from_pdf(pdf_path):
@@ -21,10 +21,25 @@ def extract_text_from_pdf(pdf_path):
 
 # Extract project details from CR text
 def extract_project_details_cr_pdf(text):
-    prompt1 = get_prompt_1(text)
     response = cohere_client.generate(
         model='command-r-plus-08-2024',
-        prompt=f'From the following text, generate a numbered list of To-Do items:\n\nText:\n{text}\n\nTo-Do List:\n1. ',
+        prompt= f"Extract following detailed information from the text:\n"
+               f"1. Nom du projet\n"
+               f"2. Numéro du RC\n"
+               f"3. Description\n"
+               f"4. Date limite de soumission\n"
+               f"5. Adresse\n"
+               f"6. Visites obligatoires \n"
+               f"7. Objet de la consultation  \n"
+               f"8. Votre lot :  \n"
+               f"9. Durée des marchés:\n"
+               f"10. Contact de l'acheteur (Nom, Titre, Téléphone, Courriel)\n"
+               f"11. Acheteur : \n\n"
+               f"Synthèse des éléments pertinents :\n"
+               f"2.Actions à prendre par SEF (Stores et Fermetures) :\n"
+               f"Extract the following detailed information from the text::\n"
+               f"Text:\n{text}",
+
     )
     
     extracted_data = response.generations[0].text.strip()
@@ -53,15 +68,9 @@ def save_json_to_file(data, pdf_path):
 
 # Generate numbered To-Do list
 def generate_numbered_todo_list_pdf(text):
-    prompt2 = get_prompt_2(text)
     response = cohere_client.generate(
         model='command-r-plus-08-2024',
-        prompt=f"Extract following detailed information from the text:\n"
-               f"Synthèse des éléments pertinents :\n"
-               f"2.Actions à prendre par SEF (Stores et Fermetures) :\n"
-               f"Text:\n{text}",
-        temperature=0.7,
-        max_tokens=1500
+        prompt=f'From the following text, generate a numbered list of To-Do items:\n\nText:\n{text}\n\nTo-Do List:\n1. ',
     )
 
     todo_list = response.generations[0].text.strip()
@@ -107,3 +116,9 @@ def process_all_pdfs_in_folder(folder_path):
             csv_path = save_numbered_todo_list_to_csv(todo_list, pdf_path)
             print(f"To-Do list saved to {csv_path}")
 
+                # Optionally display the extracted data and To-Do list in the UI
+            st.subheader(f"Extracted Details from {file_name}")
+            st.json(cr_details)
+
+            st.subheader(f"Generated To-Do List from {file_name}")
+            st.write("\n".join(todo_list))
