@@ -37,7 +37,6 @@ if uploaded_file is not None:
 
     # Copy files matching 'rc' pattern
     copy_rc_files(unzip_file_location, rc_file_location)
-    delete_files_with_same_size(rc_file_location)
 
     st.success("File processing completed!")
 
