@@ -4,6 +4,7 @@ from src.zip_extractor import save_uploaded_file, extract_zip, delete_zip_files
 from src.rc_handler import copy_r_files, copy_rc_files, create_zip_from_folder
 from src.pdfreader import process_all_pdfs_in_folder
 from src.rc_handler import delete_files_with_same_size
+from src.docxreader import process_all_docx_in_folder
 # Streamlit Interface for uploading ZIP files
 st.title("ZIP File Processor")
 
@@ -37,6 +38,7 @@ if uploaded_file is not None:
 
     # Copy files matching 'rc' pattern
     copy_rc_files(unzip_file_location, rc_file_location)
+    delete_files_with_same_size(rc_file_location)
 
     st.success("File processing completed!")
 
@@ -60,6 +62,10 @@ if uploaded_file is not None:
             # Provide download links for JSON and CSV files
             json_files = [f for f in os.listdir(rc_file_location) if f.endswith('_pdf_cr_synthes.json')]
             csv_files = [f for f in os.listdir(rc_file_location) if f.endswith('_pdf_todo_list.csv')]
+            
+            process_all_docx_in_folder(rc_file_location)
+            json_files = [f for f in os.listdir(rc_file_location) if f.endswith('_docx_cr_synthes.json')]
+            csv_files = [f for f in os.listdir(rc_file_location) if f.endswith('_docx_todo_list.csv')]
 
             rc_zip_buffer = create_zip_from_folder(rc_file_location) 
             st.download_button(
@@ -67,8 +73,8 @@ if uploaded_file is not None:
             data=rc_zip_buffer,
             file_name="rc_files.zip",
             mime="application/zip"   )
-            st.success("PDF processing completed! JSON and CSV files are available for download.")
+            st.success("PDF and DOCX processing completed! JSON and CSV files are available for download.")
         else:
-            st.warning("No PDF files found in the RC Files directory.")
+            st.warning("No PDF or DOCX files found in the RC Files directory.")
 else:
     st.info("Please upload a ZIP file to begin processing.")
