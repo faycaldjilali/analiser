@@ -14,12 +14,6 @@ def copy_r_files(source_dir, target_dir, keywords):
             if any(keyword.lower() in file.lower() for keyword in keywords):
                 file_path = os.path.join(root, file)
                 destination_file_path = os.path.join(target_dir, file)
-
-                if os.path.exists(destination_file_path):
-                    file_name, file_extension = os.path.splitext(file)
-                    new_file_name = f"{file_name}_2{file_extension}"
-                    destination_file_path = os.path.join(target_dir, new_file_name)
-
                 shutil.copy(file_path, destination_file_path)
                 st.write(f"Copied {file_path} to {destination_file_path}")
 
@@ -32,15 +26,33 @@ def copy_rc_files(source_dir, target_dir):
             if re.search(pattern, os.path.splitext(file)[0], re.IGNORECASE):
                 file_path = os.path.join(root, file)
                 destination_file_path = os.path.join(target_dir, file)
-
-                if os.path.exists(destination_file_path):
-                    file_name, file_extension = os.path.splitext(file)
-                    new_file_name = f"{file_name}_2{file_extension}"
-                    destination_file_path = os.path.join(target_dir, new_file_name)
-
                 shutil.copy(file_path, destination_file_path)
                 st.write(f"Copied {file_path} to {destination_file_path}")
 
+
+def delete_files_with_same_size(directory):
+    file_sizes = {}
+    files_to_delete = set()
+
+    # Iterate over files in the directory
+    for file_name in os.listdir(directory):
+        file_path = os.path.join(directory, file_name)
+        size = os.path.getsize(file_path)
+
+        # Check if this size is already seen
+        if size in file_sizes:
+            # If size is the same, add the new file to delete list
+            files_to_delete.add(file_path)
+
+    # Delete files
+    for file_path in files_to_delete:
+        try:
+            os.remove(file_path)
+            print(f"Deleted {file_path}")
+        except Exception as e:
+            print(f"Error deleting file {file_path}: {e}")
+            
+            
 def create_zip_from_folder(folder_path):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
