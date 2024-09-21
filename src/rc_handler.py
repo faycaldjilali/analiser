@@ -18,7 +18,7 @@ def copy_r_files(source_dir, target_dir, keywords):
                 st.write(f"Copied {file_path} to {destination_file_path}")
 def copy_rc_files(source_dir, target_dir):
     os.makedirs(target_dir, exist_ok=True)
-
+    
     pattern = r'(^|[_\.\s])rc([_\.\s]|$)'
     for root, dirs, files in os.walk(source_dir):
         for file in files:
@@ -27,7 +27,7 @@ def copy_rc_files(source_dir, target_dir):
                 destination_file_path = os.path.join(target_dir, file)
                 shutil.copy(file_path, destination_file_path)
                 st.write(f"Copied {file_path} to {destination_file_path}")
-def delete_files_with_same_size(directory):
+    def delete_files_with_same_size(directory):
     file_sizes = {}
     files_to_delete = set()
 
