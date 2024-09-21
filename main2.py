@@ -3,7 +3,7 @@ import streamlit as st
 from src.zip_extractor import save_uploaded_file, extract_zip, delete_zip_files
 from src.rc_handler import copy_r_files, copy_rc_files, create_zip_from_folder
 from src.pdfreader import process_all_pdfs_in_folder
-from src.pdf_cleanup import delete_files_with_same_size
+from src.rc_handler import delete_files_with_same_size
 # Streamlit Interface for uploading ZIP files
 st.title("ZIP File Processor")
 
@@ -29,7 +29,7 @@ if uploaded_file is not None:
     extract_zip(zip_file_path, unzip_file_location)
 
     # Delete ZIP files after extraction
-    delete_zip_files(zip_file_location)
+    delete_zip_files(unzip_file_location)
 
     # Copy specific files based on keywords (Règlement de la consultation)
     keywords = ["Règlement de la consultation", "Reglement de consultation"]
@@ -43,7 +43,7 @@ if uploaded_file is not None:
 
     # Create ZIP files for download
     unzip_zip_buffer = create_zip_from_folder(unzip_file_location)
-    rc_zip_buffer = create_zip_from_folder(rc_file_location)
+    
 
     st.download_button(
         label="Download Unzipped Files",
@@ -52,12 +52,7 @@ if uploaded_file is not None:
         mime="application/zip"
     )
 
-    st.download_button(
-        label="Download RC Files",
-        data=rc_zip_buffer,
-        file_name="rc_files.zip",
-        mime="application/zip"
-    )
+
 
     if st.button("Process RC Files"):
         if os.listdir(rc_file_location):
@@ -67,30 +62,12 @@ if uploaded_file is not None:
             json_files = [f for f in os.listdir(rc_file_location) if f.endswith('_pdf_cr_synthes.json')]
             csv_files = [f for f in os.listdir(rc_file_location) if f.endswith('_pdf_todo_list.csv')]
 
-            # Provide download buttons for JSON files
-            for json_file in json_files:
-                json_path = os.path.join(rc_file_location, json_file)
-                with open(json_path, 'r', encoding='utf-8') as file:
-                    json_data = file.read()
-                st.download_button(
-                    label=f"Download {json_file}",
-                    data=json_data,
-                    file_name=json_file,
-                    mime='application/json'
-                )
-            
-            # Provide download buttons for CSV files
-            for csv_file in csv_files:
-                csv_path = os.path.join(rc_file_location, csv_file)
-                with open(csv_path, 'r', encoding='utf-8') as file:
-                    csv_data = file.read()
-                st.download_button(
-                    label=f"Download {csv_file}",
-                    data=csv_data,
-                    file_name=csv_file,
-                    mime='text/csv'
-                )
-                
+            rc_zip_buffer = create_zip_from_folder(rc_file_location) 
+            st.download_button(
+            label="Download RC Files",
+            data=rc_zip_buffer,
+            file_name="rc_files.zip",
+            mime="application/zip"   )
             st.success("PDF processing completed! JSON and CSV files are available for download.")
         else:
             st.warning("No PDF files found in the RC Files directory.")
