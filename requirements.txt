@@ -4,6 +4,7 @@ openpyxl
 python-dotenv
 python-docx
 streamlit
+setuptools
 
 
 
